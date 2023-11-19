@@ -1,6 +1,7 @@
 import io
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 from dataclasses import dataclass
+from typing import Dict
 
 import numpy as np
 from PIL import Image
@@ -15,25 +16,23 @@ class Size:
     bitrate: float
     max_size: int = -1  # bytes
     frame_pixels: int = None
+    fps: int = 5
 
     def __post_init__(self):
         self.frame_pixels = self.dimension.width * self.dimension.height * 3
         if self.max_size == -1:
             # frame_pixels * fps * seconds
-            self.max_size = self.frame_pixels * 60 * 10
+            self.max_size = self.frame_pixels * self.fps * 10
 
 
-class Sizes:
-    P7680: Size = Size(Dimension(7680, 4320), 48, None)
-    P2160: Size = Size(Dimension(3840, 2160), 24)
-    P1080: Size = Size(Dimension(1920, 1080), 12)
-    P720: Size  = Size(Dimension(1280, 720), 7.5)
-    P480: Size  = Size(Dimension(720, 480), 4)
-    P360: Size  = Size(Dimension(480, 360), 1.5)
-
-    @classmethod
-    def clsiter(cls):
-        return iter([cls.P360, cls.P480, cls.P720, cls.P1080, cls.P2160, cls.P7680])
+Sizes: Dict[str, Size] = OrderedDict({
+    '360': Size(Dimension(480, 360), 1.5),
+    '480': Size(Dimension(720, 480), 4),
+    '720': Size(Dimension(1280, 720), 7.5),
+    '1080': Size(Dimension(1920, 1080), 12),
+    '2160': Size(Dimension(3840, 2160), 24),
+    '7680': Size(Dimension(7680, 4320), 48, None),
+})
 
 
 def img_bytes_to_array(frame) -> np.ndarray[np.uint8]:
