@@ -73,7 +73,7 @@ print('Processing video')
 # parse images to create video
 new_fn = md5(FILE_NAME.encode()).hexdigest()[-8:]
 process = subprocess.run(
-    f'ffmpeg -y -hide_banner -v warning -stats -f image2pipe -r {FPS} -i pipe: -c:v libaom-av1 -b:v {CHOSEN_SIZE.bitrate}M -pix_fmt gbrp -lossless 1 -crf 0 "output/{new_fn}.mp4"',
+    f'ffmpeg -y -hide_banner -v warning -stats -f image2pipe -r {FPS} -i pipe: -c:v libaom-av1 -b:v {CHOSEN_SIZE.bitrate}M -pix_fmt rgb24 -lossless 1 -crf 0 "output/{new_fn}.mp4"',
     shell=True, input=img_io.getvalue(), check=True
 )
 
