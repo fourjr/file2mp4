@@ -19,7 +19,7 @@ class Size:
     fps: int = 5
 
     def __post_init__(self):
-        self.frame_pixels = self.dimension.width * self.dimension.height * 3
+        self.frame_pixels = (self.dimension.width // 8) * (self.dimension.height // 8) * 3
         if self.max_size == -1:
             # frame_pixels * fps * seconds
             self.max_size = self.frame_pixels * self.fps * 10
@@ -35,20 +35,21 @@ Sizes: Dict[str, Size] = OrderedDict({
 })
 
 
-def img_bytes_to_array(frame) -> np.ndarray[np.uint8]:
-    data = io.BytesIO(frame)
-    img = Image.open(data)
-    return np.asarray(img, dtype=np.uint8).flatten()
-
-
 class Constants:
     PNG_HEADER = b'\x00\x00\x00\x00IEND\xaeB`\x82'
 
 
 class Frame:
-    def __init__(self, raw_frame_data) -> None:
+    def __init__(self, raw_frame_data, id) -> None:
         self.cursor = 0
-        self.frame = img_bytes_to_array(raw_frame_data)
+        self.id = id
+        self.frame = self._img_bytes_to_array(raw_frame_data)
+
+    def _img_bytes_to_array(self, frame) -> np.ndarray[np.uint8]:
+        data = io.BytesIO(frame)
+        img = Image.open(data)
+        img = img.resize((img.width // 8, img.height // 8), Image.Resampling.NEAREST)
+        return np.asarray(img, dtype=np.uint8).flatten()
 
     def read_buffer(self, size) -> np.ndarray[np.uint8]:
         val = self.frame[self.cursor:self.cursor + size]
