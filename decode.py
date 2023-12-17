@@ -50,6 +50,7 @@ for n, frame in tqdm(enumerate(frames), unit='f', total=len(frames)):
         except UnicodeDecodeError:
             raise ValueError('Invalid frame data, please check your input file')
 
+        print('fn', fn)
         data_len = frame.read_int(8)
         file_data = np.empty(data_len, dtype=np.uint8)
 

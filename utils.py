@@ -49,7 +49,15 @@ class Frame:
         data = io.BytesIO(frame)
         img = Image.open(data)
         img = img.resize((img.width // 8, img.height // 8), Image.Resampling.NEAREST)
-        return np.asarray(img, dtype=np.uint8).flatten()
+        vals = np.asarray(img, dtype=np.uint8).flatten()
+        vals = np.rint(np.divide(vals, 16)).astype(np.uint8)
+        final = (((vals[::2] << 4) | vals[1::2]))
+        if self.id == 0:
+            final.tofile('final_dec.bin')
+        return final
+
+
+        # np.left_shift(vals, 3, where=np.)
 
     def read_buffer(self, size) -> np.ndarray[np.uint8]:
         val = self.frame[self.cursor:self.cursor + size]
